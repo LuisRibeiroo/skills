@@ -1,0 +1,309 @@
+{
+  "name": "Base Design System",
+  "$comment": "Default base tokens. Source of truth for a project's design-system/tokens.json: copy, ratify per section, then generate with scripts/generate-design-tokens.mjs. Structure (primitive scale + semantic aliases, 4px grid, radius roles, tonal color roles) follows the so_players design system; values are neutral.",
+  "output": {
+    "css": "src/styles/tokens.css",
+    "dart": "lib/core/design/app_tokens.g.dart"
+  },
+  "modes": [
+    "light",
+    "dark"
+  ],
+  "space": {
+    "$comment": "4px grid. xxs (2) is hairline-only: separators, track insets.",
+    "xxs": 2,
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24,
+    "xxl": 32,
+    "xxxl": 48
+  },
+  "gap": {
+    "$comment": "Semantic space between things (proximity): inside a group < between groups. Values reference space.*.",
+    "tight": "xs",
+    "inline": "sm",
+    "items": "md",
+    "group": "lg",
+    "header": "xl",
+    "section": "xxl"
+  },
+  "inset": {
+    "$comment": "Semantic padding inside a container. Values reference space.*.",
+    "controlSm": "md",
+    "control": "lg",
+    "cardDense": "lg",
+    "card": "xl"
+  },
+  "radius": {
+    "sm": {
+      "value": 4,
+      "doc": "Tiny inner elements"
+    },
+    "md": {
+      "value": 8,
+      "doc": "Controls: buttons, inputs, tags"
+    },
+    "lg": {
+      "value": 16,
+      "doc": "Cards, dialogs"
+    },
+    "xl": {
+      "value": 24,
+      "doc": "Hero / large blocks"
+    },
+    "pill": {
+      "value": 9999,
+      "doc": "Chips, badges"
+    }
+  },
+  "fontFamily": {
+    "heading": "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+    "body": "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+    "mono": "ui-monospace, 'SF Mono', Menlo, Consolas, monospace"
+  },
+  "fontSize": {
+    "displayLg": 56,
+    "displayMd": 44,
+    "headlineLg": 32,
+    "headlineMd": 24,
+    "headlineSm": 20,
+    "bodyLg": 16,
+    "bodyMd": 14,
+    "bodySm": 12,
+    "labelLg": 14,
+    "labelMd": 12,
+    "labelSm": 11
+  },
+  "fontWeight": {
+    "regular": 400,
+    "medium": 500,
+    "semibold": 600,
+    "bold": 700
+  },
+  "lineHeight": {
+    "tight": 1.2,
+    "normal": 1.5,
+    "relaxed": 1.75
+  },
+  "letterSpacing": {
+    "$comment": "em. Dart consumers multiply by the font size.",
+    "tight": -0.02,
+    "normal": 0,
+    "wide": 0.05
+  },
+  "shadow": {
+    "$comment": "Elevation. Color is always color.shadow. Levels: 0 canvas · 1 surface + borderSubtle · 2 surfaceRaised · 3 surfaceRaised + shadow.raised (dropdown, popover, tooltip) · 4 dialog + shadow.overlay over scrim.",
+    "raised": {
+      "x": 0,
+      "y": 2,
+      "blur": 8,
+      "doc": "Level 3 — dropdown, popover, tooltip"
+    },
+    "overlay": {
+      "x": 0,
+      "y": 8,
+      "blur": 32,
+      "doc": "Level 4 — dialog"
+    }
+  },
+  "iconSize": {
+    "sm": 16,
+    "md": 20,
+    "lg": 24,
+    "xl": 32,
+    "hero": 48
+  },
+  "breakpoint": {
+    "$comment": "Window-size classes: compact < medium ≤ width < expanded. Media queries use the literal px values.",
+    "medium": 600,
+    "expanded": 1024
+  },
+  "grid": {
+    "$comment": "Per window size. margin is also the page-body inset: inner < outer at every nesting level.",
+    "columns": {
+      "compact": 4,
+      "medium": 8,
+      "expanded": 12
+    },
+    "gutter": {
+      "compact": 16,
+      "medium": 16,
+      "expanded": 24
+    },
+    "margin": {
+      "compact": 16,
+      "medium": 24,
+      "expanded": 24
+    },
+    "containerMax": 1280
+  },
+  "controlSize": {
+    "$comment": "Component geometry on the 4px grid. Heights, hit areas and fixed control dimensions.",
+    "touchTarget": 44,
+    "buttonXs": 32,
+    "buttonSm": 40,
+    "buttonMd": 48,
+    "buttonLg": 56,
+    "inputSm": 40,
+    "input": 48,
+    "iconButtonSm": 32,
+    "iconButtonMd": 40,
+    "iconButtonLg": 48,
+    "chip": 32,
+    "tagSm": 20,
+    "tagMd": 28,
+    "checkbox": 24,
+    "radio": 24,
+    "switchWidth": 52,
+    "switchHeight": 32,
+    "listItemSm": 48,
+    "listItemMd": 56,
+    "listItemLg": 72
+  },
+  "opacity": {
+    "$comment": "Derived states. tint/tintBorder: soft fill and edge from a status or accent role; disabled: reduced emphasis.",
+    "tint": 0.12,
+    "tintBorder": 0.3,
+    "disabled": 0.38
+  },
+  "borderWidth": {
+    "thin": 1,
+    "medium": 2
+  },
+  "dimension": {
+    "$comment": "OPTIONAL. Fixed element/block sizes (AppSize.sN / --size-N) on the 4px grid. Content widths are column spans of the expanded grid (AppSpan.cN / --span-N), derived from grid when spans is true. Any other fixed width/height literal must be a multiple of 4 up to 64 and a multiple of 8 above 64 (0 and 1 are free).",
+    "spans": true,
+    "values": [
+      2,
+      4,
+      8,
+      12,
+      16,
+      20,
+      24,
+      32,
+      40,
+      44,
+      48,
+      56,
+      64,
+      72,
+      96,
+      120,
+      144,
+      160,
+      176,
+      224,
+      256
+    ]
+  },
+  "viewport": {
+    "$comment": "OPTIONAL, part of dimension. Dialogs and sheets cap at a fraction of the window height, never a fixed px max-height.",
+    "dialogMaxHeightFraction": 0.9
+  },
+  "color": {
+    "$comment": "Semantic roles only. 8-digit hex = #RRGGBBAA. Text roles meet 4.5:1 on canvas and surface.",
+    "canvas": {
+      "doc": "Level 0 — page background",
+      "light": "#FAFAFA",
+      "dark": "#0F1115"
+    },
+    "surface": {
+      "doc": "Level 1 — cards, sidebar",
+      "light": "#FFFFFF",
+      "dark": "#171A21"
+    },
+    "surfaceRaised": {
+      "doc": "Level 2 — dialogs, popovers, dropdowns",
+      "light": "#FFFFFF",
+      "dark": "#1F232B"
+    },
+    "surfaceSunken": {
+      "doc": "Inputs, wells",
+      "light": "#F4F4F5",
+      "dark": "#0A0C10"
+    },
+    "textPrimary": {
+      "doc": "Primary text",
+      "light": "#18181B",
+      "dark": "#E6E8EC"
+    },
+    "textSecondary": {
+      "doc": "Secondary text",
+      "light": "#52525B",
+      "dark": "#A1A7B3"
+    },
+    "textMuted": {
+      "doc": "Meta, helper text",
+      "light": "#71717A",
+      "dark": "#8B92A0"
+    },
+    "accent": {
+      "doc": "Brand / primary action — used sparingly",
+      "light": "#2563EB",
+      "dark": "#60A5FA"
+    },
+    "onAccent": {
+      "doc": "Text/icons on accent fills",
+      "light": "#FFFFFF",
+      "dark": "#0B1220"
+    },
+    "borderSubtle": {
+      "doc": "Hairline",
+      "light": "#0000001A",
+      "dark": "#FFFFFF1A"
+    },
+    "borderStrong": {
+      "doc": "Emphasised edge",
+      "light": "#00000033",
+      "dark": "#FFFFFF33"
+    },
+    "borderActive": {
+      "doc": "Focus / selected edge",
+      "light": "#2563EB",
+      "dark": "#60A5FA"
+    },
+    "overlayHover": {
+      "doc": "Row / item hover",
+      "light": "#0000000D",
+      "dark": "#FFFFFF0D"
+    },
+    "overlayPressed": {
+      "doc": "Pressed state",
+      "light": "#00000014",
+      "dark": "#FFFFFF14"
+    },
+    "error": {
+      "doc": "Status — feedback only, never decoration",
+      "light": "#DC2626",
+      "dark": "#F87171"
+    },
+    "warning": {
+      "doc": "Status",
+      "light": "#B45309",
+      "dark": "#FBBF24"
+    },
+    "success": {
+      "doc": "Status",
+      "light": "#15803D",
+      "dark": "#4ADE80"
+    },
+    "info": {
+      "doc": "Status",
+      "light": "#0369A1",
+      "dark": "#38BDF8"
+    },
+    "scrim": {
+      "doc": "Modal backdrop",
+      "light": "#000000B3",
+      "dark": "#000000BF"
+    },
+    "shadow": {
+      "doc": "Shadow base for elevation levels 3–4",
+      "light": "#0000001F",
+      "dark": "#00000080"
+    }
+  }
+}
