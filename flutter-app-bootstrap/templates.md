@@ -5,7 +5,9 @@ Fill `{{PLACEHOLDERS}}` with discovery answers from Phase 1.
 
 ---
 
-## Design System Master File
+## Design System Master File (manual path only)
+
+Used only when `ds_mode = manual`. On the `setup-ds` path this file is not generated.
 
 Save to `design-system/{{APP_NAME}}/MASTER.md`. This is the canonical machine-readable design system consumed by the `ui-ux-pro-max` skill.
 
@@ -246,7 +248,7 @@ Before delivering any Flutter UI code, verify:
 
 ---
 
-## DESIGN.md Pointer File
+## DESIGN.md Pointer File (manual)
 
 Save to `.claude/rules/DESIGN.md`. This is a **reference-only** file — do NOT put token values here. All design details live in `design-system/{{APP_NAME}}/MASTER.md`.
 
@@ -413,19 +415,7 @@ ALL reactivity must use the `{{STATE_PACKAGE}}` package.
 
 Route flow: `/` (Splash) → `/login` or `/onboarding` → `/home`.
 
-### Design System (STRICT — no hardcoded values)
-
-It is **PROHIBITED** to use hardcoded colors, spacings, or font sizes (e.g. `Colors.red`, `SizedBox(height: 10)`). Always use tokens from `lib/core/constants/app_theme.dart`:
-
-- **`AppColors`** — background ({{BG_HEX}}), surface ({{SURFACE_HEX}}), primaryAction ({{PRIMARY_HEX}}), success ({{SUCCESS_HEX}}), textPrimary ({{TEXT_PRIMARY_HEX}}), textSecondary ({{TEXT_SECONDARY_HEX}})
-- **`AppSpacing`** — 8pt grid: xs={{XS}}, sm={{SM}}, md={{MD}}, lg={{LG}}, xl={{XL}}
-- **`AppFontSize`** — displayLg={{FONT_DISPLAY_LG}}, titleLg={{FONT_TITLE_LG}}, bodyLg={{FONT_BODY_LG}}, bodyMd={{FONT_BODY_MD}}, labelMd={{FONT_LABEL_MD}}, button={{FONT_BUTTON}}
-- **`AppFontWeight`** — bold (w700), semibold (w600), medium (w500), regular (w400)
-- **`AppLineHeight`** — tight ({{LH_TIGHT}}), normal ({{LH_NORMAL}}), relaxed ({{LH_RELAXED}})
-- **`AppRadius`** — sm ({{RADIUS_SM}}px), md ({{RADIUS_MD}}px), pill ({{RADIUS_PILL}}px)
-- **`AppTheme.dark`** — the single `ThemeData` ({{FONT_FAMILY}} font via `google_fonts`)
-
-{{IF_DARK_MODE_ONLY}}The app is dark-mode exclusive. Never add light-mode support.{{/IF_DARK_MODE_ONLY}}
+{{DESIGN_SYSTEM_SECTION}}
 
 ### Loading States — Skeleton Screens (STRICT)
 
@@ -490,9 +480,49 @@ Every class in domain and data layers MUST have corresponding unit tests in `tes
 
 ---
 
-## AppTheme
+## CLAUDE.md Design System Section
 
-Generate `lib/core/constants/app_theme.dart` using design system values from discovery.
+Insert at `{{DESIGN_SYSTEM_SECTION}}` in the CLAUDE.md baseline. Pick by `ds_mode`.
+
+### Manual
+
+````markdown
+### Design System (STRICT — no hardcoded values)
+
+It is **PROHIBITED** to use hardcoded colors, spacings, or font sizes (e.g. `Colors.red`, `SizedBox(height: 10)`). Always use tokens from `lib/core/constants/app_theme.dart`:
+
+- **`AppColors`** — background ({{BG_HEX}}), surface ({{SURFACE_HEX}}), primaryAction ({{PRIMARY_HEX}}), success ({{SUCCESS_HEX}}), textPrimary ({{TEXT_PRIMARY_HEX}}), textSecondary ({{TEXT_SECONDARY_HEX}})
+- **`AppSpacing`** — 8pt grid: xs={{XS}}, sm={{SM}}, md={{MD}}, lg={{LG}}, xl={{XL}}
+- **`AppFontSize`** — displayLg={{FONT_DISPLAY_LG}}, titleLg={{FONT_TITLE_LG}}, bodyLg={{FONT_BODY_LG}}, bodyMd={{FONT_BODY_MD}}, labelMd={{FONT_LABEL_MD}}, button={{FONT_BUTTON}}
+- **`AppFontWeight`** — bold (w700), semibold (w600), medium (w500), regular (w400)
+- **`AppLineHeight`** — tight ({{LH_TIGHT}}), normal ({{LH_NORMAL}}), relaxed ({{LH_RELAXED}})
+- **`AppRadius`** — sm ({{RADIUS_SM}}px), md ({{RADIUS_MD}}px), pill ({{RADIUS_PILL}}px)
+- **`AppTheme.dark`** — the single `ThemeData` ({{FONT_FAMILY}} font via `google_fonts`)
+
+{{IF_DARK_MODE_ONLY}}The app is dark-mode exclusive. Never add light-mode support.{{/IF_DARK_MODE_ONLY}}
+````
+
+### setup-ds
+
+The first sentence is the exact pointer `setup-ds` step 4 prescribes; keep it verbatim.
+
+````markdown
+### Design System (STRICT — no hardcoded values)
+
+UI work: follow `design-system/DESIGN.md` and `design-system/COMPONENTS.md`; tokens in `design-system/tokens.json`, never edit generated files.
+
+Hardcoded colors, spacings, font sizes, radii and control sizes are **PROHIBITED** (e.g. `Colors.red`, `SizedBox(height: 10)`). Use the classes generated into `lib/core/design/app_tokens.g.dart`: `AppSpacing` / `AppGap` / `AppInset`, `AppRadius`, `AppFontSize` / `AppFontWeight` / `AppLineHeight`, `AppControlSize`, `AppIconSize`, and colors through `context.colors` (an `AppColors`). The theme lives in `lib/core/design/app_theme.dart`.
+
+Change a token: edit `design-system/tokens.json`, then run `node scripts/generate-design-tokens.mjs` (`--check` fails on stale output).
+
+{{IF_DARK_MODE_ONLY}}The app is dark-mode exclusive (`modes: ["dark"]`). Never add light-mode support.{{/IF_DARK_MODE_ONLY}}
+````
+
+---
+
+## AppTheme (manual)
+
+Used only when `ds_mode = manual`. Generate `lib/core/constants/app_theme.dart` using design system values from discovery.
 
 Replace `{{FONT_METHOD}}` with the camelCase Google Fonts method (e.g., `inter` for Inter, `poppins` for Poppins).
 
@@ -617,3 +647,220 @@ abstract final class AppTheme {
   }
 }
 ```
+
+---
+
+## DESIGN.md Pointer (setup-ds)
+
+Save to `.claude/rules/DESIGN.md` when `ds_mode = setup-ds`. Reference-only: no token values.
+
+```markdown
+# Design Rules: {{APP_DISPLAY_NAME}}
+
+> **Canonical design system:** rules in [`design-system/DESIGN.md`](../../design-system/DESIGN.md), component specs in [`design-system/COMPONENTS.md`](../../design-system/COMPONENTS.md), tokens in [`design-system/tokens.json`](../../design-system/tokens.json).
+
+- Tokens are generated into `lib/core/design/app_tokens.g.dart`. Never edit it: change `tokens.json`, then run `node scripts/generate-design-tokens.mjs` (`--check` fails on stale output).
+- Theme: `lib/core/design/app_theme.dart`. Colors come from `context.colors`.
+- `ui-ux-pro-max` (`--stack flutter`) may inform layout and UX; it never overrides these tokens or specs.
+
+**Absolute prohibitions:** no hardcoded colors, spacing, font sizes, radii or control sizes (generated token classes only); no `Colors.*` or `Color(0x…)` in feature UI; drop shadows only as `AppShadow.raised` / `AppShadow.overlay` at elevation levels 3 and 4; no `CircularProgressIndicator` as page loader (`redacted` skeletons; a spinner only inside a button). {{MODE_PROHIBITION}}
+```
+
+---
+
+## AppTheme (setup-ds)
+
+Generate `lib/core/design/app_theme.dart` when `ds_mode = setup-ds`. It declares **only** `AppTheme`, the `AppColorsTheme` carrier and the `context.colors` accessor; every token class comes from `app_tokens.g.dart` (never redeclare them).
+
+Adapt to the ratified `tokens.json`:
+
+- One `static ThemeData get <mode>` per entry in `modes` (`light`, `dark`).
+- Token names below are the `setup-ds` defaults. If the user renamed or dropped a token, edit the line to match; `flutter analyze` flags any miss.
+- `AppFontFamily.*` is `null` for system fonts and a family name otherwise; the helper handles both.
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'app_tokens.g.dart';
+
+/// Carries the generated [AppColors] of the active mode through [ThemeData].
+@immutable
+class AppColorsTheme extends ThemeExtension<AppColorsTheme> {
+  const AppColorsTheme(this.colors);
+
+  final AppColors colors;
+
+  @override
+  AppColorsTheme copyWith({AppColors? colors}) => AppColorsTheme(colors ?? this.colors);
+
+  @override
+  AppColorsTheme lerp(covariant AppColorsTheme? other, double t) =>
+      t < 0.5 || other == null ? this : other;
+}
+
+extension AppColorsContext on BuildContext {
+  AppColors get colors => Theme.of(this).extension<AppColorsTheme>()!.colors;
+}
+
+abstract final class AppTheme {
+  {{MODE_GETTERS}} // e.g. static ThemeData get dark => _build(AppColors.dark, Brightness.dark);
+
+  static TextStyle _text({
+    required String? family,
+    required double size,
+    required FontWeight weight,
+    required double height,
+    required Color color,
+    double tracking = 0,
+  }) {
+    final style = TextStyle(
+      fontSize: size,
+      fontWeight: weight,
+      height: height,
+      letterSpacing: tracking * size,
+      color: color,
+    );
+    return family == null ? style : GoogleFonts.getFont(family, textStyle: style);
+  }
+
+  static OutlineInputBorder _inputBorder(Color color, [double width = AppBorderWidth.thin]) =>
+      OutlineInputBorder(
+        borderRadius: AppRadius.mdAll,
+        borderSide: BorderSide(color: color, width: width),
+      );
+
+  static ThemeData _build(AppColors c, Brightness brightness) {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: brightness,
+      scaffoldBackgroundColor: c.canvas,
+      dividerColor: c.borderSubtle,
+      colorScheme: ColorScheme(
+        brightness: brightness,
+        primary: c.accent,
+        onPrimary: c.onAccent,
+        secondary: c.accent,
+        onSecondary: c.onAccent,
+        error: c.error,
+        onError: c.onAccent,
+        surface: c.surface,
+        onSurface: c.textPrimary,
+      ),
+      extensions: [AppColorsTheme(c)],
+      appBarTheme: AppBarTheme(
+        backgroundColor: c.canvas,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: c.accent,
+          foregroundColor: c.onAccent,
+          elevation: 0,
+          minimumSize: const Size(0, AppControlSize.buttonMd),
+          padding: const EdgeInsets.symmetric(horizontal: AppInset.control),
+          shape: const RoundedRectangleBorder(borderRadius: AppRadius.mdAll),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: c.surfaceSunken,
+        contentPadding: const EdgeInsets.symmetric(horizontal: AppInset.control),
+        border: _inputBorder(c.borderSubtle),
+        enabledBorder: _inputBorder(c.borderSubtle),
+        focusedBorder: _inputBorder(c.borderActive, AppBorderWidth.medium),
+        errorBorder: _inputBorder(c.error),
+        focusedErrorBorder: _inputBorder(c.error, AppBorderWidth.medium),
+        hintStyle: TextStyle(color: c.textMuted),
+      ),
+      textTheme: TextTheme(
+        displayLarge: _text(
+          family: AppFontFamily.heading,
+          size: AppFontSize.displayLg,
+          weight: AppFontWeight.bold,
+          height: AppLineHeight.tight,
+          color: c.textPrimary,
+          tracking: AppLetterSpacing.tight,
+        ),
+        displayMedium: _text(
+          family: AppFontFamily.heading,
+          size: AppFontSize.displayMd,
+          weight: AppFontWeight.bold,
+          height: AppLineHeight.tight,
+          color: c.textPrimary,
+          tracking: AppLetterSpacing.tight,
+        ),
+        headlineLarge: _text(
+          family: AppFontFamily.heading,
+          size: AppFontSize.headlineLg,
+          weight: AppFontWeight.semibold,
+          height: AppLineHeight.tight,
+          color: c.textPrimary,
+          tracking: AppLetterSpacing.tight,
+        ),
+        headlineMedium: _text(
+          family: AppFontFamily.heading,
+          size: AppFontSize.headlineMd,
+          weight: AppFontWeight.semibold,
+          height: AppLineHeight.tight,
+          color: c.textPrimary,
+        ),
+        headlineSmall: _text(
+          family: AppFontFamily.heading,
+          size: AppFontSize.headlineSm,
+          weight: AppFontWeight.semibold,
+          height: AppLineHeight.tight,
+          color: c.textPrimary,
+        ),
+        bodyLarge: _text(
+          family: AppFontFamily.body,
+          size: AppFontSize.bodyLg,
+          weight: AppFontWeight.regular,
+          height: AppLineHeight.normal,
+          color: c.textPrimary,
+        ),
+        bodyMedium: _text(
+          family: AppFontFamily.body,
+          size: AppFontSize.bodyMd,
+          weight: AppFontWeight.regular,
+          height: AppLineHeight.normal,
+          color: c.textPrimary,
+        ),
+        bodySmall: _text(
+          family: AppFontFamily.body,
+          size: AppFontSize.bodySm,
+          weight: AppFontWeight.regular,
+          height: AppLineHeight.normal,
+          color: c.textSecondary,
+        ),
+        labelLarge: _text(
+          family: AppFontFamily.body,
+          size: AppFontSize.labelLg,
+          weight: AppFontWeight.semibold,
+          height: AppLineHeight.normal,
+          color: c.textPrimary,
+        ),
+        labelMedium: _text(
+          family: AppFontFamily.body,
+          size: AppFontSize.labelMd,
+          weight: AppFontWeight.medium,
+          height: AppLineHeight.normal,
+          color: c.textSecondary,
+          tracking: AppLetterSpacing.wide,
+        ),
+        labelSmall: _text(
+          family: AppFontFamily.body,
+          size: AppFontSize.labelSm,
+          weight: AppFontWeight.medium,
+          height: AppLineHeight.normal,
+          color: c.textSecondary,
+        ),
+      ),
+    );
+  }
+}
+```
+
+`MaterialApp` wiring (`lib/main.dart`): dark-only → `theme: AppTheme.dark`; both modes → `theme: AppTheme.light, darkTheme: AppTheme.dark, themeMode: ThemeMode.system`.
+
