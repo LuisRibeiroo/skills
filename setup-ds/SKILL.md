@@ -1,5 +1,5 @@
 ---
-name: setup-design-system
+name: setup-ds
 description: Base design system (tokens for spacing, corners, typography, colors, elevation, icon sizes, grid, control sizes, plus component specs) for web and mobile. Use when the user wants to add, scaffold, or merge a design system or design tokens in a project.
 ---
 
