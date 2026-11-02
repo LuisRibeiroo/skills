@@ -1,7 +1,7 @@
 ---
 name: prd-generator
 description: "Generate a Product Requirements Document (PRD) for a new feature. Use when planning a feature, starting a new project, or when asked to create a PRD. Triggers on: create a prd, write prd for, plan this feature, requirements for, spec out."
-version: 2.0.0
+version: 2.1.0
 user-invocable: true
 ---
 
@@ -28,19 +28,37 @@ Create detailed Product Requirements Documents that are clear, actionable, and s
 
 Before doing anything else, look for the config file `tasks/.prd-generator.json` at the repository root.
 
-- **If it exists:** read it and skip this section. Never re-ask unless the user asks to reconfigure.
+- **If it exists:** read it and skip the questions below, except the [design system check](#later-runs-design-system-check). Never re-ask unless the user asks to reconfigure.
 - **If it does not exist:** ask the setup questions below in a single message, then write the config file (creating `tasks/` if needed).
 
-### Question 1 — Preferred UI/UX skill (always ask)
+### Question 1 — Design sources (always ask)
+
+First, look for a design system in the project (see [Detecting a local design system](#detecting-a-local-design-system)). Also list the UI/UX-related skills you can actually see in this environment so the user can pick from real options.
 
 ```
-1. Do you have a preferred UI/UX skill I should use for design guidance in PRDs?
-   A. Yes — [name the skill]
-   B. No preference — pick whatever is available when a PRD touches UI
-   C. None — skip the design pass entirely
+1. Which design sources should I use for design guidance in PRDs?
+   Pick one or combine (e.g. "1A + 1B").
+   A. This project's design system — [list the detected files]
+   B. A UI/UX skill — [name the skill]
+   C. Agent's choice — pick whatever is available when a PRD touches UI
+   D. None — skip the design pass entirely
 ```
 
-Before asking, list the UI/UX-related skills you can actually see in this environment so the user can pick from real options.
+Rules:
+
+- **Option A is listed whenever a design system was detected locally, even if the user is likely to pick something else.** Name the detected files so the user sees what it refers to. If none was detected, omit line A (keep the other letters).
+- A combines with B or C. B and C are mutually exclusive (both choose the skill). D is exclusive of everything.
+- When A is picked, it is the authority for tokens and component specs; a skill from B or C may inform layout and UX but never overrides it.
+
+#### Detecting a local design system
+
+Check the repository root for the following, in this order. List only files that exist; stop at the first group that matches, unless a later group adds files the first does not cover:
+
+1. `design-system/` (`tokens.json`, `DESIGN.md`, `COMPONENTS.md`, as written by `setup-ds`)
+2. `DESIGN.md`, `MASTER.md`, `.claude/rules/DESIGN.md`
+3. Token or theme files: `tokens.*`, `theme.*`, generated token classes (e.g. `app_tokens.g.dart`), Tailwind `@theme` / config
+
+Record what you found; it goes into the config as `designSystemPaths`.
 
 ### Question 2 — grill-me availability (ask only if missing)
 
@@ -62,11 +80,19 @@ Point the user at their skill manager or skills directory. Do not invent an inst
 {
   "uiUxMode": "preferred | agent-choice | none",
   "uiUxSkill": "<skill name, or null>",
+  "designSystem": "use | declined",
+  "designSystemPaths": ["<detected path>", "..."],
   "grillMe": "installed | declined | remind-later"
 }
 ```
 
-`remind-later` is the only value that causes the grill-me question to be asked again on a later run.
+- `uiUxMode` / `uiUxSkill` come from options B, C, D. `uiUxMode: "none"` with `designSystem: "use"` is valid (design system only).
+- `designSystem` is `use` when option A was picked, `declined` when a design system was detected and the user did not pick it. Omit `designSystem` and `designSystemPaths` when none was detected.
+- `remind-later` is the only value that causes the grill-me question to be asked again on a later run.
+
+### Later runs: design system check
+
+Configs written before this field existed, and repos that gained a design system after setup, have no `designSystem` value. On every run, if the config has none and you detect a design system locally, **mention it in one line and offer to use it** (A. Use it · B. Not now), then update the config. Never re-ask once `designSystem` is `use` or `declined`. If it is `use` and a listed path has disappeared, say so once and re-detect.
 
 ---
 
@@ -93,11 +119,17 @@ Before asking clarifying questions, estimate the scope of the output:
 
 ### How to run
 
-Follow `uiUxMode` from the config:
+Two layers, combined:
+
+**1. Project design system** — when `designSystem` is `use`, read every file in `designSystemPaths` first (for `setup-ds` output: `tokens.json`, `DESIGN.md`, `COMPONENTS.md`). It is the authority for color, typography, spacing, radii, elevation and component specs: cite its token names (e.g. `color.primary`, `space.4`) in Design Considerations and acceptance criteria instead of raw values, and list its components under "Existing components to reuse". The PRD must not propose a value the design system already defines. If a story needs something it lacks, record it as a gap under Open Questions, not as an override.
+
+**2. Skill guidance** — follow `uiUxMode` from the config:
 
 - **`preferred`** — invoke the skill named in `uiUxSkill` and incorporate its output. If that skill is no longer available, tell the user once, then fall back to `agent-choice` for this run.
-- **`agent-choice`** — decide for yourself how to produce design guidance: use any design/UI skill available in the current environment, the project's existing design system (tokens, theme files, component library, design docs), and your own judgement. Pick the best option available; do not warn about skills that are not installed.
-- **`none`** — skip the design pass. Still fill Design Considerations with the project's existing conventions and components to reuse.
+- **`agent-choice`** — decide for yourself how to produce design guidance: use any design/UI skill available in the current environment, the project's existing design conventions (theme files, component library, design docs), and your own judgement. Pick the best option available; do not warn about skills that are not installed.
+- **`none`** — no skill. If `designSystem` is `use`, the design pass runs on the design system alone; otherwise skip the pass and still fill Design Considerations with the project's existing conventions and components to reuse.
+
+When both layers run, the skill informs layout, hierarchy and UX rules; where it conflicts with the design system, the design system wins.
 
 Whatever the source, the design pass must produce: style direction, color palette, typography, UX rules to enforce, and the existing components that should be reused. Add the relevant UX rules as acceptance criteria on UI user stories.
 
@@ -204,7 +236,7 @@ Include:
 - **Typography** — font pairing, scale, and weight hierarchy.
 - **UX rules to enforce** — accessibility, touch targets, loading states, empty states, error states, navigation.
 - **Existing components to reuse** — widgets/components already in the codebase that should be leveraged.
-- **Source of the guidance** — which skill, design system, or design doc it came from.
+- **Source of the guidance** — which skill, design system (with file paths), or design doc it came from. When `designSystem` is `use`, name it here and cite its tokens.
 - **Link to mockups** if available.
 
 ### 7. Technical Considerations (Optional)
@@ -355,9 +387,10 @@ Add priority levels to tasks so users can focus on what matters most. Tasks can 
 Before saving the PRD:
 
 - [ ] First-run setup done, or `tasks/.prd-generator.json` already present
+- [ ] If a design system exists locally: it was offered in setup (or in the later-run check) and the choice is in the config
 - [ ] Asked clarifying questions with lettered options
 - [ ] Incorporated user's answers
-- [ ] **[If feature touches any page/screen]** Ran the design pass per `uiUxMode` and filled Design Considerations
+- [ ] **[If feature touches any page/screen]** Ran the design pass per `designSystem` and `uiUxMode` and filled Design Considerations (design system tokens cited when `designSystem` is `use`)
 - [ ] User stories are small and specific
 - [ ] UI user stories include UX acceptance criteria (accessibility, touch targets, loading states, etc.)
 - [ ] Functional requirements are numbered and unambiguous
@@ -369,6 +402,13 @@ Before saving the PRD:
 ## Changelog
 
 Versioned with [semantic versioning](https://semver.org/): major = changed or removed behavior, minor = new behavior, patch = wording and fixes.
+
+### 2.1.0
+
+- **Added** the project's design system as a design source in First-Run Setup. It is detected locally (`design-system/`, `DESIGN.md`, `MASTER.md`, token/theme files) and always offered when found.
+- **Added** combining: the design system can be picked together with a UI/UX skill or agent's choice; the design system wins on conflicts.
+- **Added** `designSystem` and `designSystemPaths` to `tasks/.prd-generator.json`, and a one-line later-run offer when a design system exists but was never decided (older configs, or one added after setup).
+- **Changed** the design pass to cite design-system tokens and components in Design Considerations and acceptance criteria.
 
 ### 2.0.0
 
