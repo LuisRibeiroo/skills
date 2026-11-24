@@ -105,7 +105,7 @@ flutter analyze
 flutter gen-l10n
 ```
 
-**IMPORTANT:** Never run `flutter run` directly. Instead, instruct the user to start debug via the IDE (Run/Debug button or F5) to avoid conflicts with hot reload.
+{{RUN_APP_SECTION}}
 
 ## Architecture
 
@@ -210,3 +210,31 @@ Every class in domain and data layers MUST have corresponding unit tests in `tes
 
 {{IF_NO_WIREFRAME}}<!-- TODO: Add wireframe/screen-flow document to docs/product/ -->{{/IF_NO_WIREFRAME}}
 ````
+
+---
+
+## `{{RUN_APP_SECTION}}` Fills
+
+Pick one based on whether `run-flutter-app` is installed after Preflight:
+
+**If `run-flutter-app` is installed:**
+
+```markdown
+### Running the App
+
+Always run the app via `/run-flutter-app` (live terminal tab with stdin open for `r`/`R`/`q` + Dart MCP `dtd` connection for `hot_reload` / `hot_restart`), or via IDE debug.
+```
+
+**If `run-flutter-app` is not installed (user declined in Preflight):**
+
+```markdown
+### Running the App
+
+Run `flutter run` in a **live terminal tab** with stdin open (so `r`/`R`/`q` work and logs stream) and connect **Dart MCP**, or via IDE debug:
+
+1. **Runner & deps:** Use `fvm flutter` (`.fvmrc`/`.fvm/`), `puro flutter` (`.puro.json`), or `flutter`. Run `<runner> pub get` if `.dart_tool/package_config.json` is missing.
+2. **Config:** Prefer `.vscode/launch.json` (`"type": "dart"`); otherwise resolve documented run scripts, `lib/main*.dart`, flavors, and `--dart-define-from-file` flags.
+3. **Device:** Check `<runner> devices`, boot simulator/emulator if needed, and pass `-d <id>` when multiple devices exist.
+4. **Launch in terminal tab:** Open a live terminal tab (`open_terminal_tab` + `run_in_terminal`, or print the command for the user if no terminal-tab tool exists) and wait for `Flutter run key commands`.
+5. **Connect Dart MCP:** Call `dtd` `listDtdUris` → `dtd` `connect` (using the project's `ws://…` URI from the tab) → `listConnectedApps`, then use `hot_reload` / `hot_restart` after code edits.
+```

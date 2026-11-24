@@ -10,7 +10,7 @@ Interview first, then scaffold. Run the phases in order and finish every questio
 
 ## Companion skills
 
-Two sibling skills own parts of the bootstrap: `setup-ds` (design system, branch of 1.3 and 2.4) and `setup-store-cli` (`asc` / `gpc`, Phase 3). The user picks a companion or defines that part manually.
+Three sibling skills own parts of the bootstrap: `setup-ds` (design system, branch of 1.3 and 2.4), `setup-store-cli` (`asc` / `gpc`, Phase 3), and `run-flutter-app` (live terminal `flutter run` + Dart MCP connection, `CLAUDE.md` in 2.6 and finalize reminder in 2.8). The user picks a companion or falls back to the built-in alternative.
 
 ### Preflight (before Phase 1)
 
@@ -19,7 +19,7 @@ A companion is installed when `SKILL.md` exists under `~/.claude/skills/<name>/`
 For each missing companion, ask once via `AskUserQuestion`:
 
 - **Install from remote (Recommended)** → `npx skills add LuisRibeiroo/skills@<name> -g -y` (repo `git@github.com:LuisRibeiroo/skills.git`). When `npx` fails, `git clone --depth 1` into the scratchpad and copy `<name>/` to `~/.claude/skills/<name>/`. When the remote lacks the folder, say so and continue without it.
-- **Continue without it** → that part is defined manually (design) or skipped (store CLIs).
+- **Continue without it** → that part is defined manually (design), skipped (store CLIs), or embedded as a summarized run guide in `CLAUDE.md` (`run-flutter-app`).
 
 Done when: each companion is installed (`SKILL.md` re-checked after an install) or the user declined it.
 
@@ -71,6 +71,8 @@ Required fields:
    - **Yes** → Collect screen descriptions/flows. Will generate `wireframe-prd.md`.
    - **No** → Will add a TODO in the generated `CLAUDE.md`.
 
+Done when: screen list/flows are collected or the wireframe TODO is recorded.
+
 ### 1.3 Design System
 
 _Apply [Document Import Protocol](#document-import-protocol) first; a supplied document feeds the chosen path._
@@ -109,11 +111,15 @@ Required fields (present and ask if user wants to customize):
 
 **DI:** `auto_injector` (accept override)
 
+Done when: architecture, folder structure, state management, and DI choices are confirmed.
+
 ### 1.5 Packages
 
 _Apply [Document Import Protocol](#document-import-protocol) first._
 
 Present each category from [package-catalog.md](package-catalog.md) with defaults and pub.dev links. Accept overrides or removals per category.
+
+Done when: the package list per category is confirmed.
 
 ### 1.6 Store CLIs
 
@@ -124,6 +130,8 @@ One line of context: `setup-store-cli` installs `asc` (iOS) and `gpc` (Android),
 - **Now, after scaffolding (guided)** → [Phase 3](#phase-3-store-clis).
 - **Later** → Phase 3 ends with the resume instruction.
 - **Skip** → nothing further.
+
+Done when: the store-CLI choice is recorded (or skipped for desktop/web-only targets).
 
 ### 1.7 Confirmation
 
@@ -170,6 +178,8 @@ If Firebase CLI is not available or auth fails, add to `CLAUDE.md`:
 <!-- TODO: Run `flutterfire configure` to link Firebase project -->
 ```
 
+Done when: `flutterfire configure` succeeds or the TODO is queued for `CLAUDE.md`.
+
 ### 2.4 Design System
 
 Run the **Create** section of the branch file for `ds_mode`.
@@ -190,11 +200,13 @@ Read the extension template files from this skill's `templates/extensions/` fold
 
 If the user chose a different UI layer path in 1.4, adjust presentation extension destinations accordingly.
 
+Done when: all 5 extension files exist at their target paths.
+
 ### 2.6 Generate Context Files
 
 Write the following files from [templates.md](templates.md) and the branch file's **Context-file fills**. Rule files go into `<app_name>/.claude/rules/`.
 
-1. **`CLAUDE.md`** (project root) — the baseline template filled with all discovery answers: commands, architecture overview, key dependencies. `{{DESIGN_SYSTEM_SECTION}}` comes from the branch file.
+1. **`CLAUDE.md`** (project root) — the baseline template filled with all discovery answers: commands, architecture overview, key dependencies. `{{DESIGN_SYSTEM_SECTION}}` comes from the branch file; `{{RUN_APP_SECTION}}` comes from [templates.md](templates.md) (`run-flutter-app` delegation when installed, or the summarized fallback when declined).
 
 2. **`.claude/rules/PRODUCT.md`** — App name, one-line description, target audience, core problem; target platforms; screen list / wireframe flows (from 1.2) or a TODO; navigation structure and key user journeys.
 
@@ -250,7 +262,7 @@ Done when: the commit exists and the remote is connected, or the TODO is in `CLA
 1. Run `flutter pub get`.
 2. Run the branch file's **Verify** step, then `flutter analyze`, and fix issues.
 3. Present a summary of everything created (the `setup-ds` report included on that path).
-4. Remind: start the app via IDE debug, not `flutter run`.
+4. Remind: start the app via `/run-flutter-app` (live terminal tab + Dart MCP) when installed, or via the `CLAUDE.md` terminal + Dart MCP flow / IDE debug.
 
 Done when: Verify and `flutter analyze` are clean.
 
